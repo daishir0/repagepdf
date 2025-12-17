@@ -98,14 +98,11 @@ infrastructure/systemd/repage-pdf-backend.service
 infrastructure/systemd/repage-pdf-frontend.service
 infrastructure/apache/repagepdf.conf
 
-# Large reference files (keep only small samples)
-refs/sample-normal.pdf
-refs/sample-ultrahard.pdf
+# Reference PDF files (excluded from public repo)
+refs/*.pdf
 
 # -------------------------------------------
 # Keep these files (use ! to negate)
 # -------------------------------------------
 !.env.example
 !src/backend/.env.example
-!refs/sample-easy.pdf
-!refs/sample.pdf
