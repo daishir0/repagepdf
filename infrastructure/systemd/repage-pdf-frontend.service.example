@@ -1,0 +1,22 @@
+[Unit]
+Description=RePage PDF Frontend (Next.js)
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USER
+Group=YOUR_USER
+WorkingDirectory=/path/to/repage_pdf/src/frontend
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+Environment="NODE_ENV=production"
+ExecStart=/usr/bin/npm run start
+Restart=always
+RestartSec=5
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=repage-pdf-frontend
+
+[Install]
+WantedBy=multi-user.target

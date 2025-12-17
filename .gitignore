@@ -1,0 +1,107 @@
+# ===========================================
+# RePage PDF - Git Ignore Configuration
+# ===========================================
+
+# -------------------------------------------
+# Environment & Secrets
+# -------------------------------------------
+.env
+.env.local
+.env.production
+*.key
+*.pem
+credentials.json
+
+# -------------------------------------------
+# Python
+# -------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.mypy_cache/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# -------------------------------------------
+# Node.js / Frontend
+# -------------------------------------------
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# -------------------------------------------
+# Backend Runtime Data
+# -------------------------------------------
+src/backend/storage/
+src/backend/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# -------------------------------------------
+# Outputs & Temporary Files
+# -------------------------------------------
+outputs/
+tmp/
+temp/
+*.tmp
+*.temp
+*.log
+
+# -------------------------------------------
+# Test Results & Reports
+# -------------------------------------------
+test-results/
+test-results.json
+playwright-report/
+coverage/
+.coverage
+htmlcov/
+
+# -------------------------------------------
+# IDE & Editor
+# -------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# -------------------------------------------
+# Project Specific - Exclude from Public Repo
+# -------------------------------------------
+# Operation memo (contains server-specific paths)
+memo.md
+
+# Actual systemd service files (use .example versions)
+infrastructure/systemd/repage-pdf-backend.service
+infrastructure/systemd/repage-pdf-frontend.service
+
+# Large reference files (keep only small samples)
+refs/sample-normal.pdf
+refs/sample-ultrahard.pdf
+
+# -------------------------------------------
+# Keep these files (use ! to negate)
+# -------------------------------------------
+!.env.example
+!src/backend/.env.example
+!refs/sample-easy.pdf
+!refs/sample.pdf

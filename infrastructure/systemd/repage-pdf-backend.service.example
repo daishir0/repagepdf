@@ -1,0 +1,21 @@
+[Unit]
+Description=RePage PDF Backend (FastAPI)
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USER
+Group=YOUR_USER
+WorkingDirectory=/path/to/repage_pdf/src/backend
+Environment="PATH=/path/to/python/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/path/to/python/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8018
+Restart=always
+RestartSec=5
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=repage-pdf-backend
+
+[Install]
+WantedBy=multi-user.target

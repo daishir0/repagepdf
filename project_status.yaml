@@ -1,0 +1,166 @@
+project_name: repage_pdf
+created_at: '2025-12-12 17:43:36'
+updated_at: '2025-12-17 01:30:00'
+tech_stack:
+  infrastructure: EC2 Linux (Amazon Linux 2023)
+  frontend: Next.js
+  backend: Python / FastAPI
+  database: SQLite（標準） / PostgreSQL（切替可能）
+current_phase: phase5_テスト
+phase_status:
+  phase1_要件定義:
+    name: 要件定義
+    status: approved
+    documents:
+    - name: 業務フロー図.md
+      title: 業務フロー図
+      status: approved
+      last_review: '2025-12-12'
+    - name: ユースケース図.md
+      title: ユースケース図
+      status: approved
+      last_review: '2025-12-12'
+    - name: 要件定義書.md
+      title: 要件定義書
+      status: approved
+      last_review: '2025-12-12'
+  phase2_基本設計:
+    name: 基本設計
+    status: approved
+    documents:
+    - name: 機能一覧表.md
+      title: 機能一覧表
+      status: approved
+      last_review: '2025-12-16'
+    - name: システム構成図.md
+      title: システム構成図
+      status: approved
+      last_review: '2025-12-16'
+    - name: ER図.md
+      title: ER図
+      status: approved
+      last_review: '2025-12-16'
+    - name: 外部インターフェース定義書.md
+      title: 外部インターフェース定義書
+      status: approved
+      last_review: '2025-12-16'
+    - name: 画面一覧_遷移図.md
+      title: 画面一覧・遷移図
+      status: approved
+      last_review: '2025-12-16'
+  phase3_詳細設計:
+    name: 詳細設計
+    status: approved
+    documents:
+    - name: データベース設計書.md
+      title: データベース設計書
+      status: approved
+      last_review: '2025-12-16'
+    - name: API設計書.md
+      title: API設計書
+      status: approved
+      last_review: '2025-12-16'
+    - name: クラス設計書.md
+      title: クラス設計書
+      status: approved
+      last_review: '2025-12-16'
+    - name: 画面設計書.md
+      title: 画面設計書
+      status: approved
+      last_review: '2025-12-16'
+    - name: バッチ処理設計書.md
+      title: バッチ処理設計書
+      status: approved
+      last_review: '2025-12-16'
+  phase4_開発:
+    name: 開発
+    status: approved
+    documents:
+    - name: ソースコード一覧.md
+      title: ソースコード一覧
+      status: approved
+      last_review: '2025-12-16'
+    - name: 単体テスト仕様書.md
+      title: 単体テスト仕様書
+      status: approved
+      last_review: '2025-12-16'
+    - name: 単体テスト実績報告書.md
+      title: 単体テスト実績報告書
+      status: approved
+      last_review: '2025-12-16'
+  phase5_テスト:
+    name: テスト
+    status: in_progress
+    documents:
+    - name: テスト項目一覧.md
+      title: テスト項目一覧（MECE）
+      status: approved
+      last_review: '2025-12-16'
+    - name: E2Eテスト仕様書.md
+      title: E2Eテスト仕様書
+      status: approved
+      last_review: '2025-12-16'
+    - name: テスト実績報告書.md
+      title: テスト実績報告書
+      status: approved
+      last_review: '2025-12-16'
+    - name: 課題_不具合管理表.md
+      title: 課題・不具合管理表
+      status: not_started
+      last_review: null
+    infrastructure:
+    - name: apache/repagepdf.conf
+      title: Apache設定ファイル
+      status: deployed
+      deployed_at: '2025-12-16'
+    - name: systemd/repage-pdf-backend.service
+      title: バックエンドsystemd設定
+      status: deployed
+      deployed_at: '2025-12-16'
+    - name: systemd/repage-pdf-frontend.service
+      title: フロントエンドsystemd設定
+      status: deployed
+      deployed_at: '2025-12-16'
+    test_execution:
+      fqdn: https://repagepdf.path-finder.jp/
+      framework: Playwright 1.49.1
+      last_run: '2025-12-16'
+      results:
+        passed: 11
+        failed: 13
+        skipped: 3
+        total: 27
+      auth_tests: 100%
+      notes: 認証テスト完全成功、テンプレート・設定テストはセレクタ修正必要
+  phase6_移行:
+    name: 移行
+    status: not_started
+    documents:
+    - name: 移行計画書.md
+      title: 移行計画書
+      status: not_started
+      last_review: null
+    - name: 環境構築手順書.md
+      title: 環境構築手順書
+      status: not_started
+      last_review: null
+    - name: 移行実績報告書.md
+      title: 移行実績報告書
+      status: not_started
+      last_review: null
+  phase7_運用:
+    name: 運用
+    status: not_started
+    documents:
+    - name: 運用手順書.md
+      title: 運用手順書
+      status: not_started
+      last_review: null
+    - name: バックアップ_リストア手順書.md
+      title: バックアップ・リストア手順書
+      status: not_started
+      last_review: null
+    - name: 変更管理手順書.md
+      title: 変更管理手順書
+      status: not_started
+      last_review: null
