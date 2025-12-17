@@ -28,8 +28,8 @@ export default defineConfig({
 
   /* Shared settings for all the projects below. */
   use: {
-    /* Base URL from environment variable or default */
-    baseURL: process.env.E2E_BASE_URL || 'https://repagepdf.path-finder.jp',
+    /* Base URL from environment variable or default (localhost for development) */
+    baseURL: process.env.E2E_BASE_URL || 'http://localhost:3013',
 
     /* Collect trace when retrying the failed test. */
     trace: 'on-first-retry',
