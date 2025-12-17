@@ -19,10 +19,10 @@ Playwrightを使用し、実際のユーザー操作をシミュレートして�
 
 | 項目 | 値 |
 |------|-----|
-| FQDN | repagepdf.path-finder.jp |
+| FQDN | your-domain.example.com |
 | プロトコル | HTTPS |
-| フロントエンドURL | https://repagepdf.path-finder.jp/ |
-| バックエンドAPI | https://repagepdf.path-finder.jp/api |
+| フロントエンドURL | https://your-domain.example.com/ |
+| バックエンドAPI | https://your-domain.example.com/api |
 | フロントエンドポート（内部） | 3013 |
 | バックエンドポート（内部） | 8018 |
 
@@ -81,16 +81,16 @@ npx playwright install chromium
 ### 2. テスト実行
 ```bash
 # 全テスト実行
-E2E_BASE_URL=https://repagepdf.path-finder.jp npx playwright test
+E2E_BASE_URL=https://your-domain.example.com npx playwright test
 
 # 特定のテストファイル実行
-E2E_BASE_URL=https://repagepdf.path-finder.jp npx playwright test auth.spec.ts
+E2E_BASE_URL=https://your-domain.example.com npx playwright test auth.spec.ts
 
 # ヘッドレスモード無効（ブラウザ表示）
-E2E_BASE_URL=https://repagepdf.path-finder.jp npx playwright test --headed
+E2E_BASE_URL=https://your-domain.example.com npx playwright test --headed
 
 # デバッグモード
-E2E_BASE_URL=https://repagepdf.path-finder.jp npx playwright test --debug
+E2E_BASE_URL=https://your-domain.example.com npx playwright test --debug
 ```
 
 ### 3. レポート確認
@@ -188,8 +188,8 @@ sudo journalctl -u repage-pdf-backend -f
 sudo journalctl -u repage-pdf-frontend -f
 
 # アクセス確認
-curl -I https://repagepdf.path-finder.jp/
-curl https://repagepdf.path-finder.jp/api/health
+curl -I https://your-domain.example.com/
+curl https://your-domain.example.com/api/health
 ```
 
 ---
@@ -216,4 +216,4 @@ curl https://repagepdf.path-finder.jp/api/health
 - レビュー日: 2025-12-16
 - レビュアー: Claude (AIPM)
 - 結果: **適切**
-- コメント: FQDN（repagepdf.path-finder.jp）を使用したE2Eテスト仕様。Apache/systemd設定手順も明記。Playwrightテストファイル構成も適切。
+- コメント: FQDN（your-domain.example.com）を使用したE2Eテスト仕様。Apache/systemd設定手順も明記。Playwrightテストファイル構成も適切。
