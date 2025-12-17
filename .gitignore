@@ -90,9 +90,13 @@ Thumbs.db
 # Operation memo (contains server-specific paths)
 memo.md
 
-# Actual systemd service files (use .example versions)
+# Project status (contains operational info)
+project_status.yaml
+
+# Actual config files (use .example versions)
 infrastructure/systemd/repage-pdf-backend.service
 infrastructure/systemd/repage-pdf-frontend.service
+infrastructure/apache/repagepdf.conf
 
 # Large reference files (keep only small samples)
 refs/sample-normal.pdf

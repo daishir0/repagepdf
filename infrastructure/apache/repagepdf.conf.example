@@ -1,11 +1,13 @@
-# RePage PDF - Apache Reverse Proxy Configuration
-# FQDN: repagepdf.path-finder.jp
-# Frontend: localhost:3013 (Next.js)
-# Backend: localhost:8018 (FastAPI)
+# RePage PDF - Apache Reverse Proxy Configuration Example
+# Copy this file to repagepdf.conf and edit the placeholders
+#
+# Placeholders to replace:
+#   YOUR_DOMAIN         - Your domain name (e.g., repagepdf.example.com)
+#   YOUR_CERT_PATH      - Path to SSL certificate (e.g., /etc/letsencrypt/live/example.com)
 
 # HTTP -> HTTPS redirect
 <VirtualHost *:80>
-    ServerName repagepdf.path-finder.jp
+    ServerName YOUR_DOMAIN
 
     # Redirect all HTTP to HTTPS
     RewriteEngine On
@@ -15,12 +17,12 @@
 
 # HTTPS configuration
 <VirtualHost *:443>
-    ServerName repagepdf.path-finder.jp
+    ServerName YOUR_DOMAIN
 
-    # SSL Configuration (Let's Encrypt - using path-finder.jp wildcard)
+    # SSL Configuration
     SSLEngine on
-    SSLCertificateFile /etc/letsencrypt/live/path-finder.jp/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/path-finder.jp/privkey.pem
+    SSLCertificateFile YOUR_CERT_PATH/fullchain.pem
+    SSLCertificateKeyFile YOUR_CERT_PATH/privkey.pem
 
     # Proxy settings
     ProxyPreserveHost On
@@ -42,7 +44,7 @@
 
     # Headers
     RequestHeader set X-Forwarded-Proto "https"
-    RequestHeader set X-Forwarded-Host "repagepdf.path-finder.jp"
+    RequestHeader set X-Forwarded-Host "YOUR_DOMAIN"
 
     # Logging
     ErrorLog /var/log/httpd/repagepdf_error.log
