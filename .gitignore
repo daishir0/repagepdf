@@ -89,6 +89,7 @@ Thumbs.db
 # -------------------------------------------
 # Operation memo (contains server-specific paths)
 memo.md
+improve.md
 
 # Project status (contains operational info)
 project_status.yaml

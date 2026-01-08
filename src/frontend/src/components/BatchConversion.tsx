@@ -13,8 +13,8 @@ interface BatchConversionProps {
 const converterOptions = [
   { value: 'pymupdf', label: 'PyMuPDF (高速)' },
   { value: 'pdfplumber', label: 'pdfplumber (表に強い)' },
-  { value: 'openai_vision', label: 'OpenAI Vision (高精度)' },
-  { value: 'claude_vision', label: 'Claude Vision (高精度)' },
+  { value: 'openai', label: 'OpenAI Vision (高精度)' },
+  { value: 'claude', label: 'Claude Vision (高精度)' },
 ]
 
 export function BatchConversion({ templateId, className }: BatchConversionProps) {
