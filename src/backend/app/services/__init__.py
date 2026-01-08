@@ -7,6 +7,7 @@ from app.services.conversion_service import ConversionService
 from app.services.learning_service import LearningService
 from app.services.settings_service import SettingsService
 from app.services.html_generator_service import HtmlGeneratorService
+from app.services.batch_service import BatchService
 
 __all__ = [
     "AuthService",
@@ -14,5 +15,6 @@ __all__ = [
     "ConversionService",
     "LearningService",
     "SettingsService",
-    "HtmlGeneratorService"
+    "HtmlGeneratorService",
+    "BatchService"
 ]

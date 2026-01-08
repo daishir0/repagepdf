@@ -48,5 +48,5 @@ def get_db() -> Generator[Session, None, None]:
 
 def init_db():
     """データベース初期化（テーブル作成）"""
-    from app.models import user, template, conversion, settings as settings_model
+    from app.models import user, template, conversion, batch, settings as settings_model, wordpress_publication
     Base.metadata.create_all(bind=engine)

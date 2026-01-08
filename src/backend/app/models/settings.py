@@ -19,6 +19,10 @@ class UserSettings(Base):
     anthropic_model = Column(String(50), default="claude-3-haiku-20240307", nullable=False)
     openai_api_key_enc = Column(Text)  # 暗号化されたAPIキー
     anthropic_api_key_enc = Column(Text)  # 暗号化されたAPIキー
+    # WordPress連携設定（暗号化）
+    wp_url_enc = Column(Text)  # 暗号化されたWordPress URL
+    wp_username_enc = Column(Text)  # 暗号化されたユーザー名
+    wp_app_password_enc = Column(Text)  # 暗号化されたアプリケーションパスワード
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     # Relationships
@@ -45,6 +49,11 @@ class UserSettings(Base):
     def has_anthropic_key(self) -> bool:
         """Anthropic APIキーが設定されているか"""
         return bool(self.anthropic_api_key_enc)
+
+    @property
+    def has_wordpress_config(self) -> bool:
+        """WordPress連携が設定されているか"""
+        return bool(self.wp_url_enc and self.wp_username_enc and self.wp_app_password_enc)
 
     def __repr__(self):
         return f"<UserSettings(user_id={self.user_id}, converter={self.current_converter})>"

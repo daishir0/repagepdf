@@ -27,6 +27,7 @@ class Template(Base):
     # Relationships
     user = relationship("User", back_populates="templates")
     conversions = relationship("Conversion", back_populates="template")
+    batches = relationship("Batch", back_populates="template")
 
     # ステータス定数
     STATUS_PENDING = "pending"

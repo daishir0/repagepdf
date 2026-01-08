@@ -106,3 +106,6 @@ refs/*.pdf
 # -------------------------------------------
 !.env.example
 !src/backend/.env.example
+CLAUDE.md
+.claude/
+.kiro/

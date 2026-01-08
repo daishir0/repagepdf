@@ -132,6 +132,12 @@ class ConversionService:
     def set_converting_status(self, conversion: Conversion):
         """変換中ステータスに更新"""
         conversion.status = Conversion.STATUS_CONVERTING
+        conversion.progress = 0
+        self.db.commit()
+
+    def update_progress(self, conversion: Conversion, progress: int):
+        """進捗率を更新 (0-100)"""
+        conversion.progress = min(100, max(0, progress))
         self.db.commit()
 
     def set_converted_status(
@@ -146,6 +152,7 @@ class ConversionService:
         conversion.generated_html = html
         conversion.converter_used = converter_used
         conversion.page_count = page_count
+        conversion.progress = 100
         self.db.commit()
 
     def set_error_status(self, conversion: Conversion, error_message: str):

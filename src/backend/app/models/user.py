@@ -22,7 +22,9 @@ class User(Base):
     # Relationships
     templates = relationship("Template", back_populates="user", cascade="all, delete-orphan")
     conversions = relationship("Conversion", back_populates="user", cascade="all, delete-orphan")
+    batches = relationship("Batch", back_populates="user", cascade="all, delete-orphan")
     settings = relationship("UserSettings", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    wordpress_publications = relationship("WordPressPublication", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email})>"

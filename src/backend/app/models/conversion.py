@@ -15,6 +15,7 @@ class Conversion(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     template_id = Column(Integer, ForeignKey("templates.id", ondelete="RESTRICT"), nullable=False, index=True)
+    batch_id = Column(String(36), ForeignKey("batches.id", ondelete="CASCADE"), nullable=True, index=True)
     original_filename = Column(String(255), nullable=False)
     pdf_path = Column(String(500), nullable=False)
     generated_html = Column(Text)
@@ -22,6 +23,7 @@ class Conversion(Base):
     converter_used = Column(String(50))
     requested_converter = Column(String(50))  # フロントエンドから指定されたコンバーター
     page_count = Column(Integer)
+    progress = Column(Integer, default=0)  # 進捗率 (0-100)
     error_message = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -30,7 +32,9 @@ class Conversion(Base):
     # Relationships
     user = relationship("User", back_populates="conversions")
     template = relationship("Template", back_populates="conversions")
+    batch = relationship("Batch", back_populates="conversions")
     images = relationship("ExtractedImage", back_populates="conversion", cascade="all, delete-orphan")
+    wordpress_publications = relationship("WordPressPublication", back_populates="conversion")
 
     # ステータス定数
     STATUS_UPLOADING = "uploading"

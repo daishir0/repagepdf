@@ -188,6 +188,25 @@ def get_conversion(
         raise HTTPException(status_code=404, detail={"code": e.code, "message": e.message})
 
 
+@router.delete("/{conversion_id}", response_model=ApiResponse[dict])
+def delete_conversion(
+    conversion_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """変換削除"""
+    try:
+        conversion_service = ConversionService(db)
+        conversion_service.delete(conversion_id, current_user.id)
+
+        return ApiResponse.ok(
+            data={"id": conversion_id, "deleted": True},
+            message="変換を削除しました"
+        )
+    except ConversionNotFoundException as e:
+        raise HTTPException(status_code=404, detail={"code": e.code, "message": e.message})
+
+
 @router.post("/{conversion_id}/generate", response_model=ApiResponse[ConversionGenerateResponse])
 async def generate_html(
     conversion_id: int,
@@ -530,5 +549,36 @@ def get_image(
         mime_type = mime_types.get(ext, "application/octet-stream")
 
         return Response(content=image_data, media_type=mime_type)
+    except ConversionNotFoundException as e:
+        raise HTTPException(status_code=404, detail={"code": e.code, "message": e.message})
+
+
+@router.get("/{conversion_id}/pdf")
+def get_pdf(
+    conversion_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """元PDFファイル取得"""
+    try:
+        # 認証・認可チェック
+        conversion_service = ConversionService(db)
+        conversion = conversion_service.get_by_id(conversion_id, current_user.id)
+
+        if not conversion.pdf_path:
+            raise HTTPException(status_code=404, detail={"code": "PDF_NOT_FOUND", "message": "PDFファイルが見つかりません"})
+
+        # PDFファイルを取得
+        pdf_data = file_storage.get_file(conversion.pdf_path)
+        if not pdf_data:
+            raise HTTPException(status_code=404, detail={"code": "PDF_NOT_FOUND", "message": "PDFファイルが見つかりません"})
+
+        return Response(
+            content=pdf_data,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'inline; filename="{conversion.original_filename}"'
+            }
+        )
     except ConversionNotFoundException as e:
         raise HTTPException(status_code=404, detail={"code": e.code, "message": e.message})

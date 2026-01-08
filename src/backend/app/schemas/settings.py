@@ -61,6 +61,14 @@ class ModelUpdateRequest(BaseModel):
     anthropic_model: Optional[str] = None
 
 
+class WordPressConfigStatus(BaseModel):
+    """WordPress設定状況スキーマ"""
+    is_configured: bool
+    has_url: bool
+    has_username: bool
+    has_password: bool
+
+
 class UserSettingsResponse(BaseModel):
     """ユーザー設定統合レスポンススキーマ"""
     id: int
@@ -71,6 +79,8 @@ class UserSettingsResponse(BaseModel):
     anthropic_model: str
     auto_extract_images: bool = True
     image_quality: int = 85
+    # WordPress連携設定状況
+    wordpress_config: WordPressConfigStatus
 
 
 class UserSettingsUpdateRequest(BaseModel):
@@ -82,3 +92,7 @@ class UserSettingsUpdateRequest(BaseModel):
     anthropic_model: Optional[str] = None
     auto_extract_images: Optional[bool] = None
     image_quality: Optional[int] = None
+    # WordPress連携設定
+    wp_url: Optional[str] = None
+    wp_username: Optional[str] = None
+    wp_app_password: Optional[str] = None

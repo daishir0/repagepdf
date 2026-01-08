@@ -117,3 +117,54 @@ class SettingsService:
             "openai_api_key": openai_key,
             "anthropic_api_key": anthropic_key
         }
+
+    def update_wordpress_config(
+        self,
+        user_id: int,
+        wp_url: Optional[str] = None,
+        wp_username: Optional[str] = None,
+        wp_app_password: Optional[str] = None
+    ) -> UserSettings:
+        """WordPress連携設定を更新"""
+        settings = self.get_or_create(user_id)
+
+        if wp_url is not None:
+            if wp_url == "":
+                settings.wp_url_enc = None
+            else:
+                # HTTPSを強制
+                if not wp_url.startswith("https://"):
+                    raise ValidationException(
+                        "WordPress URLはHTTPS（https://）で始まる必要があります"
+                    )
+                encrypted = security_service.encrypt_api_key(wp_url.rstrip("/"))
+                settings.wp_url_enc = encrypted
+
+        if wp_username is not None:
+            if wp_username == "":
+                settings.wp_username_enc = None
+            else:
+                encrypted = security_service.encrypt_api_key(wp_username)
+                settings.wp_username_enc = encrypted
+
+        if wp_app_password is not None:
+            if wp_app_password == "":
+                settings.wp_app_password_enc = None
+            else:
+                encrypted = security_service.encrypt_api_key(wp_app_password)
+                settings.wp_app_password_enc = encrypted
+
+        self.db.commit()
+        self.db.refresh(settings)
+        return settings
+
+    def get_wordpress_config_status(self, user_id: int) -> dict:
+        """WordPress設定状態を取得"""
+        settings = self.get_or_create(user_id)
+
+        return {
+            "is_configured": settings.has_wordpress_config,
+            "has_url": bool(settings.wp_url_enc),
+            "has_username": bool(settings.wp_username_enc),
+            "has_password": bool(settings.wp_app_password_enc)
+        }

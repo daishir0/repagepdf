@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { FileText, Download, Trash2, Eye, Filter, FileOutput, RefreshCw } from 'lucide-react'
-import { useConversionStore, useTemplateStore } from '@/stores'
+import { FileText, Download, Trash2, Eye, Filter, FileOutput, RefreshCw, Edit } from 'lucide-react'
+import { useConversionStore, useTemplateStore, useBatchStore } from '@/stores'
+import { BatchGroup } from '@/components'
 import {
   Button,
   Card,
@@ -31,16 +32,21 @@ export default function ConversionsPage() {
     setFilterTemplate,
   } = useConversionStore()
   const { templates, fetchTemplates } = useTemplateStore()
+  const { batches, fetchBatches, deleteBatch } = useBatchStore()
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedConversionId, setSelectedConversionId] = useState<number | null>(null)
   const [previewHtml, setPreviewHtml] = useState<string | null>(null)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 
+  // batch_idがnullの変換（単一変換）のみ表示
+  const standaloneConversions = conversions.filter((c) => !c.batch_id)
+
   useEffect(() => {
     fetchConversions()
     fetchTemplates()
-  }, [fetchConversions, fetchTemplates])
+    fetchBatches()
+  }, [fetchConversions, fetchTemplates, fetchBatches])
 
   // ポーリング（処理中の変換がある場合）
   useEffect(() => {
@@ -130,7 +136,22 @@ export default function ConversionsPage() {
         </div>
       </Card>
 
-      {/* 変換履歴一覧 */}
+      {/* バッチ変換履歴 */}
+      {batches.length > 0 && (
+        <div className="space-y-4 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">一括変換</h2>
+          {batches.map((batch) => (
+            <BatchGroup
+              key={batch.id}
+              batch={batch}
+              conversions={conversions.filter((c) => c.batch_id === batch.id)}
+              onDelete={(batchId) => deleteBatch(batchId)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* 単一変換履歴一覧 */}
       <Card>
         <CardHeader>
           <CardTitle>変換一覧</CardTitle>
@@ -138,7 +159,7 @@ export default function ConversionsPage() {
         <CardContent>
           {isLoading && conversions.length === 0 ? (
             <LoadingCard message="変換履歴を読み込み中..." />
-          ) : conversions.length === 0 ? (
+          ) : standaloneConversions.length === 0 && batches.length === 0 ? (
             <EmptyState
               icon={<FileOutput className="h-12 w-12" />}
               title="変換履歴がありません"
@@ -149,9 +170,11 @@ export default function ConversionsPage() {
                 </Link>
               }
             />
+          ) : standaloneConversions.length === 0 ? (
+            <p className="text-center text-gray-500 py-4">単一変換の履歴はありません</p>
           ) : (
             <div className="space-y-3">
-              {conversions.map((conversion) => (
+              {standaloneConversions.map((conversion) => (
                 <div
                   key={conversion.id}
                   className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
@@ -197,6 +220,15 @@ export default function ConversionsPage() {
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
+                        <Link href={`/conversions/${conversion.id}/edit`}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            title="編集"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
                         <Button
                           variant="ghost"
                           size="sm"

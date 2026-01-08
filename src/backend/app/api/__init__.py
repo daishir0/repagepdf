@@ -7,6 +7,8 @@ from app.api.auth import router as auth_router
 from app.api.templates import router as templates_router
 from app.api.conversions import router as conversions_router
 from app.api.settings import router as settings_router
+from app.api.batches import router as batches_router
+from app.api.wordpress import router as wordpress_router
 
 # メインルーター
 api_router = APIRouter()
@@ -16,5 +18,7 @@ api_router.include_router(auth_router)
 api_router.include_router(templates_router)
 api_router.include_router(conversions_router)
 api_router.include_router(settings_router)
+api_router.include_router(batches_router)
+api_router.include_router(wordpress_router)
 
 __all__ = ["api_router"]

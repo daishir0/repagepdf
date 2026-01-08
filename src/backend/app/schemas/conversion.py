@@ -42,8 +42,10 @@ class ConversionResponse(BaseModel):
     """変換レスポンススキーマ"""
     id: int
     template_id: int
+    batch_id: Optional[str] = None
     original_filename: str
     status: str
+    progress: int = 0  # 進捗率 (0-100)
     page_count: Optional[int] = None
     converter_used: Optional[str] = None
     created_at: datetime

@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Settings, Key, Cpu, Check, X } from 'lucide-react'
-import { useSettingsStore, useAuthStore } from '@/stores'
+import { Settings, Key, Cpu, Check, X, Globe, ExternalLink } from 'lucide-react'
+import { useSettingsStore, useAuthStore, useWordPressStore } from '@/stores'
 import {
   Button,
   Card,
@@ -19,7 +19,8 @@ import toast from 'react-hot-toast'
 export default function SettingsPage() {
   const { settings, isLoading, isTesting, fetchSettings, updateSettings, testOpenAI, testAnthropic } =
     useSettingsStore()
-  const { user, setUser } = useAuthStore()
+  const { user } = useAuthStore()
+  const { connectionTestResult, isTestingConnection, testConnection } = useWordPressStore()
 
   // フォーム状態
   const [defaultConverter, setDefaultConverter] = useState('')
@@ -29,6 +30,12 @@ export default function SettingsPage() {
   const [anthropicModel, setAnthropicModel] = useState('')
   const [autoExtractImages, setAutoExtractImages] = useState(true)
   const [imageQuality, setImageQuality] = useState(85)
+
+  // WordPress設定
+  const [wpUrl, setWpUrl] = useState('')
+  const [wpUsername, setWpUsername] = useState('')
+  const [wpAppPassword, setWpAppPassword] = useState('')
+  const [isSavingWp, setIsSavingWp] = useState(false)
 
   // パスワード変更
   const [currentPassword, setCurrentPassword] = useState('')
@@ -78,6 +85,34 @@ export default function SettingsPage() {
     } finally {
       setIsSaving(false)
     }
+  }
+
+  const handleSaveWordPressSettings = async () => {
+    if (wpUrl && !wpUrl.startsWith('https://')) {
+      toast.error('WordPress URLはHTTPS（https://）で始まる必要があります')
+      return
+    }
+
+    setIsSavingWp(true)
+    try {
+      await updateSettings({
+        wp_url: wpUrl || undefined,
+        wp_username: wpUsername || undefined,
+        wp_app_password: wpAppPassword || undefined,
+      })
+      // 入力フィールドをクリア
+      setWpUrl('')
+      setWpUsername('')
+      setWpAppPassword('')
+    } catch {
+      // エラーはストアでハンドリング
+    } finally {
+      setIsSavingWp(false)
+    }
+  }
+
+  const handleTestWordPressConnection = async () => {
+    await testConnection()
   }
 
   const handleChangePassword = async () => {
@@ -265,6 +300,123 @@ export default function SettingsPage() {
             <div className="mt-6">
               <Button onClick={handleSaveSettings} isLoading={isSaving}>
                 設定を保存
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* WordPress連携設定 */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Globe className="h-5 w-5 text-gray-400" />
+              <CardTitle>WordPress連携</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-6 max-w-lg">
+              {/* 接続状態 */}
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium text-gray-900">接続状態</h4>
+                <div className="flex items-center gap-2">
+                  {settings?.wordpress_config?.is_configured ? (
+                    <span className="flex items-center gap-1 text-sm text-green-600">
+                      <Check className="h-4 w-4" />
+                      設定済み
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 text-sm text-gray-500">
+                      <X className="h-4 w-4" />
+                      未設定
+                    </span>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleTestWordPressConnection}
+                    disabled={!settings?.wordpress_config?.is_configured || isTestingConnection}
+                    isLoading={isTestingConnection}
+                  >
+                    接続テスト
+                  </Button>
+                </div>
+              </div>
+
+              {/* 接続テスト結果 */}
+              {connectionTestResult && (
+                <div
+                  className={`p-3 rounded-lg text-sm ${
+                    connectionTestResult.valid
+                      ? 'bg-green-50 text-green-800 border border-green-200'
+                      : 'bg-red-50 text-red-800 border border-red-200'
+                  }`}
+                >
+                  {connectionTestResult.valid ? (
+                    <div>
+                      <p className="font-medium">接続成功</p>
+                      <p>サイト名: {connectionTestResult.site_name}</p>
+                      <p>ユーザー: {connectionTestResult.user_name}</p>
+                    </div>
+                  ) : (
+                    <p>{connectionTestResult.error_message}</p>
+                  )}
+                </div>
+              )}
+
+              {/* WordPress URL */}
+              <div className="space-y-3 pt-4 border-t">
+                <Input
+                  label="WordPress URL"
+                  type="url"
+                  value={wpUrl}
+                  onChange={(e) => setWpUrl(e.target.value)}
+                  placeholder="https://your-site.com"
+                  helperText={
+                    settings?.wordpress_config?.has_url
+                      ? '設定済み（新しい値を入力すると更新されます）'
+                      : 'WordPressサイトのURL（HTTPS必須）'
+                  }
+                />
+                <Input
+                  label="ユーザー名"
+                  value={wpUsername}
+                  onChange={(e) => setWpUsername(e.target.value)}
+                  placeholder="admin"
+                  helperText={
+                    settings?.wordpress_config?.has_username
+                      ? '設定済み（新しい値を入力すると更新されます）'
+                      : 'WordPress管理者ユーザー名'
+                  }
+                />
+                <Input
+                  label="アプリケーションパスワード"
+                  type="password"
+                  value={wpAppPassword}
+                  onChange={(e) => setWpAppPassword(e.target.value)}
+                  placeholder="xxxx xxxx xxxx xxxx"
+                  helperText={
+                    settings?.wordpress_config?.has_password
+                      ? '設定済み（新しい値を入力すると更新されます）'
+                      : (
+                        <span>
+                          WordPress管理画面 → ユーザー → アプリケーションパスワードから発行
+                          <a
+                            href="https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-1 text-primary-600 hover:underline inline-flex items-center"
+                          >
+                            詳細
+                            <ExternalLink className="h-3 w-3 ml-0.5" />
+                          </a>
+                        </span>
+                      )
+                  }
+                />
+              </div>
+
+              <Button onClick={handleSaveWordPressSettings} isLoading={isSavingWp}>
+                WordPress設定を保存
               </Button>
             </div>
           </CardContent>

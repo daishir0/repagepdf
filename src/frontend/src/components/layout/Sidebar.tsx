@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutTemplate, FileOutput, Settings } from 'lucide-react'
+import { LayoutTemplate, FileOutput, Settings, Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -15,6 +15,11 @@ const navItems = [
     label: '変換履歴',
     href: '/conversions',
     icon: FileOutput,
+  },
+  {
+    label: 'WordPress',
+    href: '/wordpress',
+    icon: Globe,
   },
   {
     label: '設定',

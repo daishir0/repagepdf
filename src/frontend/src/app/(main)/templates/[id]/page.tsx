@@ -2,19 +2,18 @@
 
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useRouter, useParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft,
   Globe,
-  Upload,
   FileText,
   Download,
   Trash2,
   Eye,
   RefreshCw,
 } from 'lucide-react'
-import { useTemplateStore, useConversionStore, useSettingsStore } from '@/stores'
+import { useTemplateStore, useConversionStore, useSettingsStore, useBatchStore } from '@/stores'
 import {
   Button,
   Card,
@@ -24,26 +23,22 @@ import {
   StatusBadge,
   LoadingCard,
   EmptyState,
-  Select,
   ConfirmDialog,
 } from '@/components/ui'
-import { FileDropzone } from '@/components/FileDropzone'
+import { BatchFileDropzone, BatchFileList, BatchConversion, BatchProgress } from '@/components'
 import { formatDate, getConverterLabel } from '@/lib/utils'
-import { templateApi, conversionApi } from '@/lib/api'
+import { conversionApi } from '@/lib/api'
 
 export default function TemplateDetailPage() {
   const params = useParams()
   const templateId = parseInt(params.id as string, 10)
-  const router = useRouter()
 
   const { templates, fetchTemplates, refreshTemplate } = useTemplateStore()
-  const { conversions, fetchConversions, createConversion, deleteConversion, refreshConversion } =
+  const { conversions, fetchConversions, deleteConversion, refreshConversion } =
     useConversionStore()
   const { settings, fetchSettings } = useSettingsStore()
+  const { isConverting, currentBatch, clearFiles } = useBatchStore()
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [converterType, setConverterType] = useState<string>('')
-  const [isUploading, setIsUploading] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedConversionId, setSelectedConversionId] = useState<number | null>(null)
   const [previewHtml, setPreviewHtml] = useState<string | null>(null)
@@ -56,14 +51,11 @@ export default function TemplateDetailPage() {
     fetchTemplates()
     fetchConversions(1, templateId)
     fetchSettings()
-  }, [fetchTemplates, fetchConversions, fetchSettings, templateId])
-
-  // デフォルトコンバーター設定
-  useEffect(() => {
-    if (settings && !converterType) {
-      setConverterType(settings.default_converter)
+    // ページ離脱時にキューをクリア
+    return () => {
+      clearFiles()
     }
-  }, [settings, converterType])
+  }, [fetchTemplates, fetchConversions, fetchSettings, templateId, clearFiles])
 
   // ポーリング（処理中の変換がある場合）
   useEffect(() => {
@@ -92,19 +84,12 @@ export default function TemplateDetailPage() {
     return () => clearInterval(interval)
   }, [template, templateId, refreshTemplate])
 
-  const handleUpload = async () => {
-    if (!selectedFile || !template) return
-
-    setIsUploading(true)
-    try {
-      await createConversion(selectedFile, templateId, converterType || undefined)
-      setSelectedFile(null)
-    } catch {
-      // エラーはストアでハンドリング
-    } finally {
-      setIsUploading(false)
+  // バッチ変換完了後に履歴を再取得
+  useEffect(() => {
+    if (currentBatch?.status === 'completed' || currentBatch?.status === 'partial') {
+      fetchConversions(1, templateId)
     }
-  }
+  }, [currentBatch?.status, fetchConversions, templateId])
 
   const handleDelete = async () => {
     if (!selectedConversionId) return
@@ -143,13 +128,6 @@ export default function TemplateDetailPage() {
       // エラーハンドリング
     }
   }
-
-  const converterOptions = [
-    { value: 'pymupdf', label: 'PyMuPDF (高速)' },
-    { value: 'pdfplumber', label: 'pdfplumber (表に強い)' },
-    { value: 'openai', label: 'OpenAI Vision (高精度)' },
-    { value: 'claude', label: 'Claude Vision (高精度)' },
-  ]
 
   if (!template) {
     return <LoadingCard message="テンプレートを読み込み中..." />
@@ -215,11 +193,11 @@ export default function TemplateDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 左カラム: アップロード */}
-        <div className="lg:col-span-1">
+        {/* 左カラム: バッチアップロード */}
+        <div className="lg:col-span-1 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>PDF変換</CardTitle>
+              <CardTitle>PDF一括変換</CardTitle>
             </CardHeader>
             <CardContent>
               {template.status !== 'ready' ? (
@@ -235,33 +213,16 @@ export default function TemplateDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <FileDropzone
-                    onFileSelect={setSelectedFile}
-                    selectedFile={selectedFile}
-                    onClear={() => setSelectedFile(null)}
-                    disabled={isUploading}
-                  />
-
-                  <Select
-                    label="変換方式"
-                    value={converterType}
-                    onChange={(e) => setConverterType(e.target.value)}
-                    options={converterOptions}
-                  />
-
-                  <Button
-                    className="w-full"
-                    onClick={handleUpload}
-                    disabled={!selectedFile}
-                    isLoading={isUploading}
-                    leftIcon={<Upload className="h-4 w-4" />}
-                  >
-                    変換開始
-                  </Button>
+                  <BatchFileDropzone disabled={isConverting} />
+                  <BatchFileList />
+                  <BatchConversion templateId={templateId} />
                 </div>
               )}
             </CardContent>
           </Card>
+
+          {/* バッチ進捗表示 */}
+          {isConverting && <BatchProgress />}
         </div>
 
         {/* 右カラム: 変換履歴 */}

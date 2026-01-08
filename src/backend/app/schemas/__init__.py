@@ -18,7 +18,17 @@ from app.schemas.settings import (
     ConvertersResponse, ConverterUpdateRequest, ConverterInfo,
     ApiKeyUpdateRequest, ApiKeyStatusResponse,
     ModelsResponse, ModelUpdateRequest, ModelInfo, ModelCurrentSettings,
-    UserSettingsResponse, UserSettingsUpdateRequest
+    UserSettingsResponse, UserSettingsUpdateRequest, WordPressConfigStatus
+)
+from app.schemas.batch import (
+    BatchCreateRequest, BatchResponse, BatchDetailResponse,
+    BatchListResponse, BatchProgressUpdate
+)
+from app.schemas.wordpress import (
+    WPConnectionTestResponse, WPCategory, WPTag,
+    WPCategoriesResponse, WPTagsResponse,
+    WPPublishRequest, WPPublishResponse,
+    WPHistoryItem, WPHistoryResponse, WPHistoryFilterParams
 )
 
 __all__ = [
@@ -32,5 +42,11 @@ __all__ = [
     "ConvertersResponse", "ConverterUpdateRequest", "ConverterInfo",
     "ApiKeyUpdateRequest", "ApiKeyStatusResponse",
     "ModelsResponse", "ModelUpdateRequest", "ModelInfo", "ModelCurrentSettings",
-    "UserSettingsResponse", "UserSettingsUpdateRequest"
+    "UserSettingsResponse", "UserSettingsUpdateRequest", "WordPressConfigStatus",
+    "BatchCreateRequest", "BatchResponse", "BatchDetailResponse",
+    "BatchListResponse", "BatchProgressUpdate",
+    "WPConnectionTestResponse", "WPCategory", "WPTag",
+    "WPCategoriesResponse", "WPTagsResponse",
+    "WPPublishRequest", "WPPublishResponse",
+    "WPHistoryItem", "WPHistoryResponse", "WPHistoryFilterParams"
 ]

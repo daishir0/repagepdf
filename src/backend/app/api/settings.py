@@ -11,7 +11,7 @@ from app.schemas import (
     ApiResponse, ConvertersResponse, ConverterUpdateRequest, ConverterInfo,
     ApiKeyUpdateRequest, ApiKeyStatusResponse,
     ModelsResponse, ModelUpdateRequest, ModelInfo,
-    UserSettingsResponse, UserSettingsUpdateRequest
+    UserSettingsResponse, UserSettingsUpdateRequest, WordPressConfigStatus
 )
 from app.schemas.settings import ModelCurrentSettings
 from app.services import SettingsService
@@ -30,6 +30,9 @@ def get_settings(
     settings_service = SettingsService(db)
     user_settings = settings_service.get_or_create(current_user.id)
 
+    # WordPress設定状況を取得
+    wp_status = settings_service.get_wordpress_config_status(current_user.id)
+
     return ApiResponse.ok(
         data=UserSettingsResponse(
             id=user_settings.id,
@@ -39,7 +42,8 @@ def get_settings(
             openai_model=user_settings.openai_model,
             anthropic_model=user_settings.anthropic_model,
             auto_extract_images=True,
-            image_quality=85
+            image_quality=85,
+            wordpress_config=WordPressConfigStatus(**wp_status)
         )
     )
 
@@ -75,6 +79,18 @@ def update_settings(
                 anthropic_model=data.anthropic_model
             )
 
+        # WordPress連携設定更新
+        if data.wp_url is not None or data.wp_username is not None or data.wp_app_password is not None:
+            user_settings = settings_service.update_wordpress_config(
+                user_id=current_user.id,
+                wp_url=data.wp_url,
+                wp_username=data.wp_username,
+                wp_app_password=data.wp_app_password
+            )
+
+        # WordPress設定状況を取得
+        wp_status = settings_service.get_wordpress_config_status(current_user.id)
+
         return ApiResponse.ok(
             data=UserSettingsResponse(
                 id=user_settings.id,
@@ -84,7 +100,8 @@ def update_settings(
                 openai_model=user_settings.openai_model,
                 anthropic_model=user_settings.anthropic_model,
                 auto_extract_images=True,
-                image_quality=85
+                image_quality=85,
+                wordpress_config=WordPressConfigStatus(**wp_status)
             ),
             message="設定を更新しました"
         )

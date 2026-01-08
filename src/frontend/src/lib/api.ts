@@ -16,6 +16,13 @@ import type {
   ExtractedImage,
   UserSettings,
   SettingsUpdate,
+  WPConnectionTestResult,
+  WPCategory,
+  WPTag,
+  WPPublishRequest,
+  WPPublishResponse,
+  WPHistoryItem,
+  WPHistoryFilter,
 } from './types'
 
 // APIクライアントインスタンス
@@ -192,6 +199,66 @@ export const conversionApi = {
     )
     return response.data
   },
+
+  updateHtml: async (id: number, generatedHtml: string): Promise<ApiResponse<{ id: number; updated_at: string }>> => {
+    const response = await api.patch<ApiResponse<{ id: number; updated_at: string }>>(
+      `/conversions/${id}`,
+      { generated_html: generatedHtml }
+    )
+    return response.data
+  },
+}
+
+// ===== バッチ =====
+export const batchApi = {
+  list: async (page = 1, size = 20): Promise<ApiResponse<{ items: import('./types').Batch[]; total: number }>> => {
+    const response = await api.get<ApiResponse<{ items: import('./types').Batch[]; total: number }>>('/batches', {
+      params: { page, limit: size },
+    })
+    return response.data
+  },
+
+  get: async (id: string): Promise<ApiResponse<import('./types').BatchDetail>> => {
+    const response = await api.get<ApiResponse<import('./types').BatchDetail>>(`/batches/${id}`)
+    return response.data
+  },
+
+  create: async (
+    files: File[],
+    templateId: number,
+    converterType: string
+  ): Promise<ApiResponse<import('./types').Batch>> => {
+    const formData = new FormData()
+    files.forEach((file) => formData.append('files', file))
+    formData.append('template_id', templateId.toString())
+    formData.append('converter_type', converterType)
+    const response = await api.post<ApiResponse<import('./types').Batch>>('/batches', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return response.data
+  },
+
+  cancel: async (id: string): Promise<ApiResponse<import('./types').Batch>> => {
+    const response = await api.post<ApiResponse<import('./types').Batch>>(`/batches/${id}/cancel`)
+    return response.data
+  },
+
+  download: async (id: string): Promise<Blob> => {
+    const response = await api.get(`/batches/${id}/download`, {
+      responseType: 'blob',
+    })
+    return response.data
+  },
+
+  delete: async (id: string): Promise<ApiResponse<null>> => {
+    const response = await api.delete<ApiResponse<null>>(`/batches/${id}`)
+    return response.data
+  },
+
+  start: async (id: string): Promise<ApiResponse<import('./types').Batch>> => {
+    const response = await api.post<ApiResponse<import('./types').Batch>>(`/batches/${id}/start`)
+    return response.data
+  },
 }
 
 // ===== 設定 =====
@@ -213,6 +280,50 @@ export const settingsApi = {
 
   testAnthropic: async (): Promise<ApiResponse<{ valid: boolean; message: string }>> => {
     const response = await api.post<ApiResponse<{ valid: boolean; message: string }>>('/settings/test-anthropic')
+    return response.data
+  },
+}
+
+// ===== WordPress =====
+export const wordpressApi = {
+  testConnection: async (): Promise<ApiResponse<WPConnectionTestResult>> => {
+    const response = await api.post<ApiResponse<WPConnectionTestResult>>('/wordpress/test-connection')
+    return response.data
+  },
+
+  getCategories: async (): Promise<ApiResponse<{ categories: WPCategory[] }>> => {
+    const response = await api.get<ApiResponse<{ categories: WPCategory[] }>>('/wordpress/categories')
+    return response.data
+  },
+
+  getTags: async (): Promise<ApiResponse<{ tags: WPTag[] }>> => {
+    const response = await api.get<ApiResponse<{ tags: WPTag[] }>>('/wordpress/tags')
+    return response.data
+  },
+
+  publish: async (request: WPPublishRequest): Promise<ApiResponse<WPPublishResponse>> => {
+    const response = await api.post<ApiResponse<WPPublishResponse>>('/wordpress/publish', request)
+    return response.data
+  },
+
+  getHistory: async (
+    page = 1,
+    limit = 20,
+    filter?: WPHistoryFilter
+  ): Promise<ApiResponse<{ items: WPHistoryItem[]; total: number; page: number; limit: number }>> => {
+    const params: Record<string, unknown> = { page, limit }
+    if (filter?.site) params.site = filter.site
+    if (filter?.date_from) params.date_from = filter.date_from
+    if (filter?.date_to) params.date_to = filter.date_to
+    const response = await api.get<ApiResponse<{ items: WPHistoryItem[]; total: number; page: number; limit: number }>>(
+      '/wordpress/history',
+      { params }
+    )
+    return response.data
+  },
+
+  retryPublish: async (historyId: number): Promise<ApiResponse<WPPublishResponse>> => {
+    const response = await api.post<ApiResponse<WPPublishResponse>>(`/wordpress/history/${historyId}/retry`)
     return response.data
   },
 }

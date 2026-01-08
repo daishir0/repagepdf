@@ -80,8 +80,10 @@ export interface Conversion {
   id: number
   template_id: number
   template_name?: string
+  batch_id?: string | null
   original_filename: string
-  status: 'pending' | 'uploaded' | 'converting' | 'processing' | 'completed' | 'failed' | 'error'
+  status: 'pending' | 'uploaded' | 'converting' | 'processing' | 'completed' | 'approved' | 'failed' | 'error'
+  progress: number  // 進捗率 (0-100)
   converter_type: 'pymupdf' | 'pdfplumber' | 'openai' | 'claude'
   result_html: string | null
   error_message: string | null
@@ -107,6 +109,13 @@ export interface ExtractedImage {
 }
 
 // ===== 設定 =====
+export interface WordPressConfigStatus {
+  is_configured: boolean
+  has_url: boolean
+  has_username: boolean
+  has_password: boolean
+}
+
 export interface UserSettings {
   id: number
   default_converter: 'pymupdf' | 'pdfplumber' | 'openai' | 'claude'
@@ -116,6 +125,7 @@ export interface UserSettings {
   anthropic_model: string
   auto_extract_images: boolean
   image_quality: number
+  wordpress_config: WordPressConfigStatus
 }
 
 export interface SettingsUpdate {
@@ -126,6 +136,96 @@ export interface SettingsUpdate {
   anthropic_model?: string
   auto_extract_images?: boolean
   image_quality?: number
+  wp_url?: string
+  wp_username?: string
+  wp_app_password?: string
+}
+
+// ===== WordPress =====
+export interface WPCategory {
+  id: number
+  name: string
+  slug: string
+  count: number
+}
+
+export interface WPTag {
+  id: number
+  name: string
+  slug: string
+  count: number
+}
+
+export interface WPConnectionTestResult {
+  valid: boolean
+  site_name?: string
+  user_name?: string
+  error_message?: string
+}
+
+export interface WPPublishRequest {
+  conversion_id: number
+  title: string
+  status: 'draft' | 'publish'
+  category_ids: number[]
+  tag_ids: number[]
+  new_tags: string[]
+}
+
+export interface WPPublishResponse {
+  success: boolean
+  post_id?: number
+  post_url?: string
+  admin_url?: string
+  error_message?: string
+}
+
+export interface WPHistoryItem {
+  id: number
+  conversion_id: number | null
+  wp_site_url: string
+  wp_post_id: number | null
+  wp_post_url: string | null
+  wp_admin_url: string | null
+  title: string
+  status: 'draft' | 'publish'
+  categories: string[]
+  tags: string[]
+  publish_status: 'success' | 'failed'
+  error_message: string | null
+  published_at: string
+}
+
+export interface WPHistoryFilter {
+  site?: string
+  date_from?: string
+  date_to?: string
+}
+
+// ===== バッチ =====
+export interface Batch {
+  id: string
+  template_id: number
+  converter_type: string
+  status: 'pending' | 'processing' | 'completed' | 'partial' | 'cancelled'
+  total_files: number
+  completed_files: number
+  failed_files: number
+  created_at: string
+  updated_at: string
+}
+
+export interface BatchDetail extends Batch {
+  conversions: Conversion[]
+}
+
+export interface QueuedFile {
+  id: string
+  file: File
+  status: 'pending' | 'uploading' | 'converting' | 'completed' | 'error' | 'cancelled'
+  progress?: number
+  errorMessage?: string
+  conversionId?: number
 }
 
 // ===== ストア用 =====
@@ -167,4 +267,31 @@ export interface SettingsState {
   isLoading: boolean
   fetchSettings: () => Promise<void>
   updateSettings: (data: SettingsUpdate) => Promise<void>
+}
+
+export interface WordPressState {
+  // 接続テスト
+  connectionTestResult: WPConnectionTestResult | null
+  isTestingConnection: boolean
+  // カテゴリ・タグ
+  categories: WPCategory[]
+  tags: WPTag[]
+  isLoadingCategories: boolean
+  isLoadingTags: boolean
+  // 公開
+  isPublishing: boolean
+  publishResult: WPPublishResponse | null
+  // 履歴
+  history: WPHistoryItem[]
+  historyTotal: number
+  historyPage: number
+  isLoadingHistory: boolean
+  // アクション
+  testConnection: () => Promise<WPConnectionTestResult>
+  fetchCategories: () => Promise<void>
+  fetchTags: () => Promise<void>
+  publish: (request: WPPublishRequest) => Promise<WPPublishResponse>
+  fetchHistory: (page?: number, filter?: WPHistoryFilter) => Promise<void>
+  retryPublish: (historyId: number) => Promise<WPPublishResponse>
+  clearPublishResult: () => void
 }

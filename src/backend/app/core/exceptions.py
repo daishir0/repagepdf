@@ -173,3 +173,94 @@ class LLMException(InternalServerException):
 
     def __init__(self, message: str = "LLM APIでエラーが発生しました"):
         super().__init__(message=message, code="LLM_ERROR")
+
+
+# バッチ関連
+class BatchNotFoundException(NotFoundException):
+    """バッチが見つからない"""
+
+    def __init__(self, batch_id: str):
+        super().__init__(
+            message=f"バッチID {batch_id} が見つかりません",
+            code="BATCH_NOT_FOUND"
+        )
+
+
+class BatchAlreadyProcessingException(BadRequestException):
+    """バッチが処理中"""
+
+    def __init__(self):
+        super().__init__(
+            message="バッチは既に処理中です",
+            code="BATCH_ALREADY_PROCESSING"
+        )
+
+
+class BatchNoCompletedFilesException(BadRequestException):
+    """完了ファイルがない"""
+
+    def __init__(self):
+        super().__init__(
+            message="ダウンロード可能な完了ファイルがありません",
+            code="NO_COMPLETED_FILES"
+        )
+
+
+class BatchCannotCancelException(BadRequestException):
+    """キャンセル不可"""
+
+    def __init__(self):
+        super().__init__(
+            message="このバッチはキャンセルできません",
+            code="CANNOT_CANCEL_BATCH"
+        )
+
+
+# WordPress関連
+class WordPressNotConfiguredException(BadRequestException):
+    """WordPress未設定"""
+
+    def __init__(self):
+        super().__init__(
+            message="WordPress連携が設定されていません。設定画面で接続情報を入力してください。",
+            code="WORDPRESS_NOT_CONFIGURED"
+        )
+
+
+class WordPressConnectionException(AppException):
+    """WordPress接続エラー"""
+
+    def __init__(self, message: str = "WordPressサイトに接続できません"):
+        super().__init__(
+            code="WORDPRESS_CONNECTION_ERROR",
+            message=message,
+            status_code=503
+        )
+
+
+class WordPressAuthException(UnauthorizedException):
+    """WordPress認証エラー"""
+
+    def __init__(self, message: str = "WordPress認証に失敗しました。認証情報を確認してください。"):
+        super().__init__(message=message, code="WORDPRESS_AUTH_ERROR")
+
+
+class WordPressPublishException(AppException):
+    """WordPress公開エラー"""
+
+    def __init__(self, message: str = "WordPress投稿の作成に失敗しました"):
+        super().__init__(
+            code="WORDPRESS_PUBLISH_ERROR",
+            message=message,
+            status_code=422
+        )
+
+
+class WordPressPublicationNotFoundException(NotFoundException):
+    """公開履歴が見つからない"""
+
+    def __init__(self, publication_id: int):
+        super().__init__(
+            message=f"公開履歴ID {publication_id} が見つかりません",
+            code="WORDPRESS_PUBLICATION_NOT_FOUND"
+        )
