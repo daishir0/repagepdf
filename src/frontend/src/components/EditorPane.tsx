@@ -93,9 +93,9 @@ export function EditorPane({
 
   return (
     <div className={`flex flex-col h-full bg-white ${className}`}>
-      {/* ツールバー */}
+      {/* 統合ツールバー */}
       <div className="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200">
-        {/* モード切り替え */}
+        {/* 左: モード切り替え */}
         <div className="flex items-center gap-2">
           <Button
             variant={mode === 'preview' ? 'primary' : 'ghost'}
@@ -115,7 +115,7 @@ export function EditorPane({
           </Button>
         </div>
 
-        {/* 編集モード時の画像操作 */}
+        {/* 中央: 編集モード時の画像操作 */}
         {mode === 'edit' && (
           <div className="flex items-center gap-2">
             <Button
@@ -140,15 +140,13 @@ export function EditorPane({
           </div>
         )}
 
-        {/* 未保存インジケータ */}
-        {isDirty && (
-          <span className="text-sm text-warning-600">未保存の変更があります</span>
-        )}
-      </div>
-
-      {/* 保存ボタンと状態表示 */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-200">
-        <div>
+        {/* 右: 状態表示 + 保存ボタン */}
+        <div className="flex items-center gap-3">
+          {/* 未保存インジケータ */}
+          {isDirty && (
+            <span className="text-sm text-warning-600">●未保存</span>
+          )}
+          {/* 保存完了/エラーメッセージ */}
           {saveMessage && (
             <span
               className={`text-sm ${
@@ -160,17 +158,17 @@ export function EditorPane({
               {saveMessage.text}
             </span>
           )}
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleSave}
+            isLoading={isSaving}
+            disabled={!isDirty || isSaving}
+            leftIcon={<Save className="h-4 w-4" />}
+          >
+            保存
+          </Button>
         </div>
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={handleSave}
-          isLoading={isSaving}
-          disabled={!isDirty || isSaving}
-          leftIcon={<Save className="h-4 w-4" />}
-        >
-          保存
-        </Button>
       </div>
 
       {/* エディタ本体 */}
