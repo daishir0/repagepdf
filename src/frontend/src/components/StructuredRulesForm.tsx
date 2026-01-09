@@ -263,21 +263,21 @@ export function StructuredRulesForm({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">見出しウェイト</label>
+                  <label className="block text-sm text-gray-600 mb-1">行間</label>
                   <input
                     type="text"
-                    value={rules.design_system?.typography?.heading_weight || ''}
+                    value={rules.design_system?.typography?.line_height || ''}
                     onChange={(e) =>
                       updateNestedField(
                         'design_system',
                         'typography',
-                        'heading_weight',
+                        'line_height',
                         e.target.value
                       )
                     }
                     disabled={disabled}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100"
-                    placeholder="例: 700"
+                    placeholder="例: 1.8"
                   />
                 </div>
               </div>
@@ -322,7 +322,7 @@ export function StructuredRulesForm({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100"
                   placeholder={`例: <${key}>{{content}}</${key}>`}
                 />
-                {value && !hasPlaceholder && (
+                {value && !hasPlaceholder && key !== 'table' && (
                   <div className="flex items-center gap-1 mt-1 text-warning-600 text-xs">
                     <AlertTriangle className="h-3 w-3" />
                     <span>{'{{content}}'} プレースホルダーがありません</span>

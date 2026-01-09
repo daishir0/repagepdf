@@ -53,8 +53,12 @@ export default function TemplateDetailPage() {
   const templateConversions = conversions.filter((c) => c.template_id === templateId)
 
   useEffect(() => {
-    fetchTemplates()
-    refreshTemplate(templateId) // 詳細データ（learned_rules含む）を取得
+    // fetchTemplates完了後にrefreshTemplateを実行（競合状態を防ぐ）
+    const init = async () => {
+      await fetchTemplates()
+      await refreshTemplate(templateId) // 詳細データ（learned_rules含む）を取得
+    }
+    init()
     fetchConversions(1, templateId)
     fetchSettings()
     // ページ離脱時にキューをクリア

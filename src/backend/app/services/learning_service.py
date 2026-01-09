@@ -134,20 +134,20 @@ class LearningService:
     }},
     "typography": {{
       "font_family": "フォントファミリー",
-      "base_font_size": "ベースフォントサイズ",
-      "line_height": "行間"
+      "base_size": "ベースフォントサイズ（例: 16px）",
+      "line_height": "行間（例: 1.8）"
     }}
   }},
   "html_templates": {{
-    "article_wrapper": "<article class='...'>{{content}}</article>のような記事全体のラッパーHTML",
-    "heading_h1": "<h1 class='...'>{{text}}</h1>のようなH1のHTMLパターン",
-    "heading_h2": "<h2 class='...'>{{text}}</h2>のようなH2のHTMLパターン",
-    "heading_h3": "<h3 class='...'>{{text}}</h3>のようなH3のHTMLパターン",
-    "paragraph": "<p class='...'>{{text}}</p>のような段落のHTMLパターン",
-    "unordered_list": "<ul class='...'><li>{{item}}</li></ul>のようなリストのHTMLパターン",
-    "ordered_list": "<ol class='...'><li>{{item}}</li></ol>のような番号付きリストのHTMLパターン",
+    "article_wrapper": "<article class='...'>{{{{content}}}}</article>のような記事全体のラッパーHTML",
+    "h1": "<h1 class='...'>{{{{content}}}}</h1>のようなH1のHTMLパターン",
+    "h2": "<h2 class='...'>{{{{content}}}}</h2>のようなH2のHTMLパターン",
+    "h3": "<h3 class='...'>{{{{content}}}}</h3>のようなH3のHTMLパターン",
+    "p": "<p class='...'>{{{{content}}}}</p>のような段落のHTMLパターン",
+    "ul": "<ul class='...'><li>{{{{content}}}}</li></ul>のようなリストのHTMLパターン",
+    "ol": "<ol class='...'><li>{{{{content}}}}</li></ol>のような番号付きリストのHTMLパターン",
     "table": "<table class='...'><thead>...</thead><tbody>...</tbody></table>のようなテーブルのHTMLパターン",
-    "blockquote": "<blockquote class='...'>{{text}}</blockquote>のような引用のHTMLパターン",
+    "blockquote": "<blockquote class='...'>{{{{content}}}}</blockquote>のような引用のHTMLパターン",
     "emphasis_box": "強調ボックスやコールアウトのHTMLパターン（あれば）",
     "dialogue_box": "対話形式やQ&AボックスのHTMLパターン（あれば）"
   }},

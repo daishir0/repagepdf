@@ -215,7 +215,7 @@ HTMLを出力してください："""
             base_css.append(f"""
 .repage-content {{
     font-family: {typography.get('font_family', 'sans-serif')};
-    font-size: {typography.get('base_font_size', '16px')};
+    font-size: {typography.get('base_size', '16px')};
     line-height: {typography.get('line_height', '1.8')};
 }}
 """)

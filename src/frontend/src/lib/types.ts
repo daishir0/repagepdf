@@ -59,7 +59,7 @@ export interface LearnedRules {
     typography?: {
       font_family?: string
       base_size?: string
-      heading_weight?: string
+      line_height?: string
     }
   }
   html_templates?: {
