@@ -3,7 +3,7 @@
  */
 import { create } from 'zustand'
 import { templateApi } from '@/lib/api'
-import type { Template, TemplateCreate, TemplateUpdate } from '@/lib/types'
+import type { Template, TemplateCreate, TemplateUpdate, TemplateUpdateRules, LearnedRules } from '@/lib/types'
 import toast from 'react-hot-toast'
 
 interface TemplateState {
@@ -15,6 +15,7 @@ interface TemplateState {
   fetchTemplates: (page?: number) => Promise<void>
   createTemplate: (data: TemplateCreate) => Promise<Template>
   updateTemplate: (id: number, data: TemplateUpdate) => Promise<void>
+  updateRules: (id: number, rules: LearnedRules) => Promise<void>
   deleteTemplate: (id: number) => Promise<void>
   selectTemplate: (template: Template | null) => void
   relearnTemplate: (id: number) => Promise<void>
@@ -88,6 +89,22 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       }
     } catch (error) {
       toast.error('テンプレートの更新に失敗しました')
+      throw error
+    }
+  },
+
+  updateRules: async (id: number, rules: LearnedRules) => {
+    try {
+      const response = await templateApi.updateRules(id, { learned_rules: rules })
+      if (response.success && response.data) {
+        set((state) => ({
+          templates: state.templates.map((t) => (t.id === id ? response.data! : t)),
+          selectedTemplate: state.selectedTemplate?.id === id ? response.data! : state.selectedTemplate,
+        }))
+        toast.success('ルールを保存しました')
+      }
+    } catch (error) {
+      toast.error('ルールの保存に失敗しました')
       throw error
     }
   },

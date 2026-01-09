@@ -12,6 +12,8 @@ import {
   Trash2,
   Eye,
   RefreshCw,
+  Settings,
+  FileUp,
 } from 'lucide-react'
 import { useTemplateStore, useConversionStore, useSettingsStore, useBatchStore } from '@/stores'
 import {
@@ -25,9 +27,11 @@ import {
   EmptyState,
   ConfirmDialog,
 } from '@/components/ui'
-import { BatchFileDropzone, BatchFileList, BatchConversion, BatchProgress } from '@/components'
+import { BatchFileDropzone, BatchFileList, BatchConversion, BatchProgress, TemplateRulesEditor } from '@/components'
 import { formatDate, getConverterLabel } from '@/lib/utils'
 import { conversionApi } from '@/lib/api'
+
+type TabType = 'conversion' | 'rules'
 
 export default function TemplateDetailPage() {
   const params = useParams()
@@ -39,6 +43,7 @@ export default function TemplateDetailPage() {
   const { settings, fetchSettings } = useSettingsStore()
   const { isConverting, currentBatch, clearFiles } = useBatchStore()
 
+  const [activeTab, setActiveTab] = useState<TabType>('conversion')
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedConversionId, setSelectedConversionId] = useState<number | null>(null)
   const [previewHtml, setPreviewHtml] = useState<string | null>(null)
@@ -49,13 +54,14 @@ export default function TemplateDetailPage() {
 
   useEffect(() => {
     fetchTemplates()
+    refreshTemplate(templateId) // 詳細データ（learned_rules含む）を取得
     fetchConversions(1, templateId)
     fetchSettings()
     // ページ離脱時にキューをクリア
     return () => {
       clearFiles()
     }
-  }, [fetchTemplates, fetchConversions, fetchSettings, templateId, clearFiles])
+  }, [fetchTemplates, refreshTemplate, fetchConversions, fetchSettings, templateId, clearFiles])
 
   // ポーリング（処理中の変換がある場合）
   useEffect(() => {
@@ -192,8 +198,44 @@ export default function TemplateDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 左カラム: バッチアップロード */}
+      {/* タブナビゲーション */}
+      <div className="flex border-b mb-6">
+        <button
+          onClick={() => setActiveTab('conversion')}
+          className={`px-4 py-3 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${
+            activeTab === 'conversion'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          <FileUp className="h-4 w-4" />
+          変換
+        </button>
+        <button
+          onClick={() => setActiveTab('rules')}
+          disabled={template.status === 'learning' || template.status === 'pending'}
+          className={`px-4 py-3 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors ${
+            activeTab === 'rules'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          } ${
+            template.status === 'learning' || template.status === 'pending'
+              ? 'opacity-50 cursor-not-allowed'
+              : ''
+          }`}
+        >
+          <Settings className="h-4 w-4" />
+          ルール編集
+          {(template.status === 'learning' || template.status === 'pending') && (
+            <span className="text-xs text-gray-400 ml-1">(学習中)</span>
+          )}
+        </button>
+      </div>
+
+      {/* タブコンテンツ */}
+      {activeTab === 'conversion' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 左カラム: バッチアップロード */}
         <div className="lg:col-span-1 space-y-4">
           <Card>
             <CardHeader>
@@ -316,6 +358,14 @@ export default function TemplateDetailPage() {
           </Card>
         </div>
       </div>
+      ) : (
+        /* ルール編集タブ */
+        <TemplateRulesEditor
+          templateId={templateId}
+          learnedRules={template.learned_rules}
+          isLearning={template.status === 'learning' || template.status === 'pending'}
+        />
+      )}
 
       {/* HTMLプレビューモーダル - Portalでbody直下にレンダリング、iframeでCSS隔離 */}
       {isPreviewOpen && previewHtml && typeof document !== 'undefined' && createPortal(

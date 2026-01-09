@@ -46,6 +46,37 @@ export interface RegisterRequest {
 }
 
 // ===== テンプレート =====
+export interface LearnedRules {
+  site_name?: string
+  base_url?: string
+  design_system?: {
+    colors?: {
+      primary?: string
+      secondary?: string
+      text?: string
+      background?: string
+    }
+    typography?: {
+      font_family?: string
+      base_size?: string
+      heading_weight?: string
+    }
+  }
+  html_templates?: {
+    h1?: string
+    h2?: string
+    h3?: string
+    p?: string
+    ul?: string
+    ol?: string
+    table?: string
+    blockquote?: string
+  }
+  inline_css?: string
+  special_features?: string[]
+  conversion_instructions?: string
+}
+
 export interface Template {
   id: number
   name: string
@@ -54,6 +85,7 @@ export interface Template {
   url3: string | null
   learned_html: string | null
   css_rules: string | null
+  learned_rules?: LearnedRules | null
   status: 'pending' | 'learning' | 'ready' | 'failed'
   error_message: string | null
   user_id: number
@@ -73,6 +105,10 @@ export interface TemplateUpdate {
   url1?: string
   url2?: string
   url3?: string
+}
+
+export interface TemplateUpdateRules {
+  learned_rules: LearnedRules
 }
 
 // ===== 変換 =====

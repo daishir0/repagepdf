@@ -12,7 +12,8 @@ from app.models import User
 from app.infrastructure.database import SessionLocal
 from app.schemas import (
     ApiResponse, TemplateCreate, TemplateResponse,
-    TemplateDetailResponse, TemplateListResponse, LearnResponse
+    TemplateDetailResponse, TemplateListResponse, LearnResponse,
+    TemplateUpdateRules
 )
 from app.services import TemplateService, LearningService, SettingsService
 from app.core.exceptions import (
@@ -99,6 +100,45 @@ def get_template(
                 created_at=template.created_at,
                 updated_at=template.updated_at
             )
+        )
+    except TemplateNotFoundException as e:
+        raise HTTPException(status_code=404, detail={"code": e.code, "message": e.message})
+
+
+@router.put("/{template_id}", response_model=ApiResponse[TemplateDetailResponse])
+def update_template_rules(
+    template_id: int,
+    data: TemplateUpdateRules,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """テンプレートのlearned_rulesを更新"""
+    try:
+        template_service = TemplateService(db)
+        template = template_service.update_rules(template_id, current_user.id, data)
+
+        # learned_rulesをパース
+        learned_rules = None
+        if template.learned_rules:
+            try:
+                learned_rules = json.loads(template.learned_rules)
+            except json.JSONDecodeError:
+                learned_rules = template.learned_rules
+
+        return ApiResponse.ok(
+            data=TemplateDetailResponse(
+                id=template.id,
+                name=template.name,
+                url1=template.url1,
+                url2=template.url2,
+                url3=template.url3,
+                status=template.status,
+                learned_rules=learned_rules,
+                error_message=template.error_message,
+                created_at=template.created_at,
+                updated_at=template.updated_at
+            ),
+            message="テンプレートを更新しました"
         )
     except TemplateNotFoundException as e:
         raise HTTPException(status_code=404, detail={"code": e.code, "message": e.message})

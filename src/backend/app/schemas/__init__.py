@@ -6,7 +6,7 @@ from app.schemas.user import (
     UserCreate, UserLogin, UserResponse, TokenResponse
 )
 from app.schemas.template import (
-    TemplateCreate, TemplateUpdate, TemplateResponse,
+    TemplateCreate, TemplateUpdate, TemplateUpdateRules, TemplateResponse,
     TemplateDetailResponse, TemplateListResponse, LearnResponse
 )
 from app.schemas.conversion import (
@@ -34,7 +34,7 @@ from app.schemas.wordpress import (
 __all__ = [
     "ApiResponse", "ErrorDetail", "PaginationParams",
     "UserCreate", "UserLogin", "UserResponse", "TokenResponse",
-    "TemplateCreate", "TemplateUpdate", "TemplateResponse",
+    "TemplateCreate", "TemplateUpdate", "TemplateUpdateRules", "TemplateResponse",
     "TemplateDetailResponse", "TemplateListResponse", "LearnResponse",
     "ConversionCreate", "ConversionResponse", "ConversionDetailResponse",
     "ConversionListResponse", "ConversionUploadResponse", "ConversionGenerateResponse",

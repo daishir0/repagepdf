@@ -12,6 +12,7 @@ import type {
   Template,
   TemplateCreate,
   TemplateUpdate,
+  TemplateUpdateRules,
   Conversion,
   ExtractedImage,
   UserSettings,
@@ -109,6 +110,11 @@ export const templateApi = {
   },
 
   update: async (id: number, data: TemplateUpdate): Promise<ApiResponse<Template>> => {
+    const response = await api.put<ApiResponse<Template>>(`/templates/${id}`, data)
+    return response.data
+  },
+
+  updateRules: async (id: number, data: TemplateUpdateRules): Promise<ApiResponse<Template>> => {
     const response = await api.put<ApiResponse<Template>>(`/templates/${id}`, data)
     return response.data
   },

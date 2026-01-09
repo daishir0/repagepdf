@@ -6,7 +6,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 
 from app.models import Template
-from app.schemas import TemplateCreate, TemplateUpdate
+from app.schemas import TemplateCreate, TemplateUpdate, TemplateUpdateRules
 from app.core.exceptions import TemplateNotFoundException, TemplateHasConversionsException
 
 
@@ -80,6 +80,15 @@ class TemplateService:
         if data.url3 is not None:
             template.url3 = data.url3
 
+        self.db.commit()
+        self.db.refresh(template)
+        return template
+
+    def update_rules(self, template_id: int, user_id: int, data: TemplateUpdateRules) -> Template:
+        """テンプレートのlearned_rulesを更新"""
+        import json
+        template = self.get_by_id(template_id, user_id)
+        template.learned_rules = json.dumps(data.learned_rules, ensure_ascii=False)
         self.db.commit()
         self.db.refresh(template)
         return template

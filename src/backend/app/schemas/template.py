@@ -45,6 +45,11 @@ class TemplateUpdate(BaseModel):
     url3: Optional[str] = None
 
 
+class TemplateUpdateRules(BaseModel):
+    """テンプレートルール更新スキーマ（learned_rules専用）"""
+    learned_rules: dict
+
+
 class TemplateResponse(BaseModel):
     """テンプレートレスポンススキーマ"""
     id: int
